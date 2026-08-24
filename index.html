@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Hillclimb — Private, End-to-End Encrypted Couple Sanctuary with 48-Hour Auto-Destructing Messages.">
+  <title>Hillclimb — Private Couple Sanctuary</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Floating Heart Particles Layer -->
+  <div id="heart-particles-container" class="heart-particles-container" aria-hidden="true"></div>
+
+  <!-- Ambient Romantic Glow Orbs -->
+  <div class="ambient-glow orb-1" aria-hidden="true"></div>
+  <div class="ambient-glow orb-2" aria-hidden="true"></div>
+  <div class="ambient-glow orb-3" aria-hidden="true"></div>
+
+  <!-- =========================================================================
+       1. ROOM ACCESS GATE SCREEN (Login / Room Creation)
+       ========================================================================= -->
+  <div class="gate-overlay" id="gate-screen">
+    <div class="gate-card">
+      <div class="gate-header">
+        <div class="vault-emblem">
+          <span class="vault-icon">🏔️</span>
+          <span class="vault-heart">💖</span>
+        </div>
+        <h1 class="gate-title">Hillclimb</h1>
+        <p class="gate-subtitle">Your Private, 48-Hour Ephemeral Sanctuary</p>
+      </div>
+
+      <div class="gate-badge-row">
+        <span class="gate-badge">🔒 AES-256 Encrypted</span>
+        <span class="gate-badge">⏳ 48h Auto-Burn</span>
+        <span class="gate-badge">🤫 100% Private</span>
+      </div>
+
+      <form id="gate-form" class="gate-form" autocomplete="off">
+        <!-- 1. Unique Name -->
+        <div class="form-group">
+          <label for="user-nickname-input" class="gate-label">Your Unique Name</label>
+          <div class="input-with-icon">
+            <span class="input-icon">✨</span>
+            <input type="text" id="user-nickname-input" class="gate-input" placeholder="e.g. Alex or Babe" required maxlength="24">
+          </div>
+          <span class="field-hint">Your name in this private sanctuary.</span>
+        </div>
+
+        <!-- 2. Room Code -->
+        <div class="form-group">
+          <div class="label-row">
+            <label for="room-code-input" class="gate-label">Room Code</label>
+            <button type="button" class="btn-text-action" id="btn-generate-room">✨ Generate Code</button>
+          </div>
+          <div class="input-with-icon">
+            <span class="input-icon">🗝️</span>
+            <input type="text" id="room-code-input" class="gate-input" placeholder="e.g. LOVE-2026 or OUR-SECRET" required maxlength="32">
+          </div>
+          <span class="field-hint">Both of you must enter the exact same room code.</span>
+        </div>
+
+        <!-- 3. Room Passkey -->
+        <div class="form-group">
+          <label for="room-passkey-input" class="gate-label">Room Passkey (Password)</label>
+          <div class="input-with-icon">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="room-passkey-input" class="gate-input" placeholder="Shared secret password only you two know" required minlength="4">
+            <button type="button" class="btn-toggle-pass" id="btn-toggle-pass" aria-label="Toggle password visibility">👁️</button>
+          </div>
+          <span class="field-hint">Used for client-side AES-256 encryption.</span>
+        </div>
+
+        <button type="submit" class="btn btn-gate btn-block" id="btn-enter-vault">
+          <span class="btn-text">Enter Private Sanctuary 💕</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. MAIN COUPLE CHAT ROOM
+       ========================================================================= -->
+  <div class="chat-app" id="chat-app" style="display: none;">
+    
+    <!-- Top Sanctuary Bar -->
+    <header class="sanctuary-header" id="sanctuary-header">
+      <div class="header-left">
+        <div class="couple-avatars">
+          <div class="avatar-bubble my-avatar" id="hdr-my-avatar" title="You">👑</div>
+          <div class="avatar-heart-connector">💕</div>
+          <div class="avatar-bubble partner-avatar" id="hdr-partner-avatar" title="Partner">🌸</div>
+        </div>
+        <div class="room-meta">
+          <div class="room-title-row">
+            <h2 class="room-name" id="hdr-partner-name">Sweetheart</h2>
+            <span class="status-indicator online" id="partner-presence-status" title="Partner status"></span>
+          </div>
+          <div class="room-subtext">
+            <span class="room-code-tag" id="btn-copy-code" title="Click to copy Room Code">
+              🔑 <span id="display-room-code">LOVE-2026</span>
+            </span>
+            <span class="relationship-counter" id="relationship-counter">Day 1 Together ✨</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="ephemeral-badge" title="All messages auto-destruct 48 hours after being sent">
+          <span class="fire-icon">⏳</span>
+          <span class="badge-text">48h Auto-Burn Active</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Heartbeat Pulse Button -->
+        <button class="action-btn heartbeat-btn" id="btn-send-heartbeat" title="Send a Heartbeat Pulse to your partner!">
+          <span class="heart-pulse-icon">💓</span>
+          <span class="btn-label">Pulse</span>
+        </button>
+
+        <!-- Theme Picker Dropdown -->
+        <div class="theme-dropdown-wrapper">
+          <button class="action-btn icon-only" id="btn-theme-menu" title="Change Theme" aria-label="Theme selector">🎨</button>
+          <div class="theme-dropdown" id="theme-dropdown">
+            <button class="theme-select-item" data-theme="midnight">🌌 Midnight Velvet</button>
+            <button class="theme-select-item" data-theme="rosequartz">🌸 Rose Quartz</button>
+            <button class="theme-select-item" data-theme="sunset">🌅 Sunset Romance</button>
+            <button class="theme-select-item" data-theme="cybertwilight">💜 Cyber Twilight</button>
+          </div>
+        </div>
+
+        <!-- Stealth / Panic Button -->
+        <button class="action-btn stealth-btn" id="btn-stealth-mode" title="Stealth Panic Screen (Press ESC)" aria-label="Stealth mode">
+          🤫 <span class="btn-label">Stealth</span>
+        </button>
+
+        <!-- Room Settings / Actions -->
+        <div class="settings-dropdown-wrapper">
+          <button class="action-btn icon-only" id="btn-settings-menu" title="More Options" aria-label="More options">⚙️</button>
+          <div class="settings-dropdown" id="settings-dropdown">
+            <button class="settings-item" id="btn-clear-chat">🔥 Burn All Messages Now</button>
+            <button class="settings-item text-danger" id="btn-leave-room">🚪 Lock & Leave Sanctuary</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Message Area -->
+    <main class="chat-main" id="chat-main">
+      <div class="messages-container" id="messages-container">
+        
+        <!-- Welcome Intimate Hero Card -->
+        <div class="vault-welcome-card" id="vault-welcome-card">
+          <div class="welcome-heart">💌</div>
+          <h3>Welcome to Your Private Sanctuary</h3>
+          <p>Everything shared here is encrypted on your device. Every message, doodle, and voice note permanently vanishes <strong>48 hours</strong> after being sent.</p>
+          <div class="welcome-shortcuts">
+            <span class="shortcut-pill">✨ Tip: Press <strong>ESC</strong> for instant Stealth Screen</span>
+            <span class="shortcut-pill">💓 Tap <strong>Pulse</strong> to send love vibrations</span>
+          </div>
+        </div>
+
+        <!-- Chat message bubbles dynamically injected here -->
+        <div class="messages-stream" id="messages-stream"></div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-bubble" id="typing-indicator" style="display: none;">
+          <span class="typing-partner" id="typing-partner-label">Sweetheart is typing</span>
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Input Sanctuary Bar -->
+    <footer class="chat-input-bar">
+      <!-- Quick Emoji Bar -->
+      <div class="quick-emojis-bar">
+        <button class="quick-emoji" data-emoji="❤️">❤️</button>
+        <button class="quick-emoji" data-emoji="🥰">🥰</button>
+        <button class="quick-emoji" data-emoji="💋">💋</button>
+        <button class="quick-emoji" data-emoji="🥺">🥺</button>
+        <button class="quick-emoji" data-emoji="✨">✨</button>
+        <button class="quick-emoji" data-emoji="🌹">🌹</button>
+        <button class="quick-emoji" data-emoji="🧸">🧸</button>
+        <button class="quick-emoji" data-emoji="💌">💌</button>
+        <button class="quick-emoji" data-emoji="🍫">🍫</button>
+        <button class="quick-emoji" data-emoji="🥂">🥂</button>
+      </div>
+
+      <!-- Active Voice Recording Bar (hidden by default) -->
+      <div class="recording-bar" id="recording-bar" style="display: none;">
+        <div class="rec-dot-pulse"></div>
+        <span class="rec-timer" id="rec-timer">00:00</span>
+        <span class="rec-status">Recording Voice Memo...</span>
+        <div class="rec-actions">
+          <button type="button" class="btn-rec-action cancel" id="btn-cancel-recording" title="Cancel">✕ Cancel</button>
+          <button type="button" class="btn-rec-action send" id="btn-send-recording" title="Send Voice Memo">✓ Send Voice Note</button>
+        </div>
+      </div>
+
+      <!-- Standard Input Controls -->
+      <form class="input-form" id="chat-form">
+        <div class="input-actions-left">
+          <!-- Love Doodle Trigger -->
+          <button type="button" class="btn-icon-input" id="btn-open-doodle" title="Draw a Love Doodle">
+            🎨
+          </button>
+          <!-- Voice Note Trigger -->
+          <button type="button" class="btn-icon-input" id="btn-start-record" title="Record Voice Memo">
+            🎙️
+          </button>
+          <!-- Time Capsule Trigger -->
+          <button type="button" class="btn-icon-input" id="btn-open-capsule" title="Lock a Time Capsule Message">
+            ⏳
+          </button>
+          <!-- Image Attachment -->
+          <label class="btn-icon-input file-label" title="Send Encrypted Picture">
+            📷
+            <input type="file" id="image-file-input" accept="image/*" style="display: none;">
+          </label>
+        </div>
+
+        <!-- Textarea -->
+        <div class="input-wrapper">
+          <textarea id="message-input" class="message-input" placeholder="Whisper something sweet... (Enter to send)" rows="1"></textarea>
+        </div>
+
+        <div class="input-actions-right">
+          <button type="submit" class="btn-send" id="btn-send-message" aria-label="Send Message">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </footer>
+  </div>
+
+  <!-- =========================================================================
+       3. LOVE DOODLE CANVAS MODAL
+       ========================================================================= -->
+  <div class="modal-overlay" id="doodle-modal" style="display: none;">
+    <div class="doodle-modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3>🎨 Draw a Love Note</h3>
+          <p>Sketch a cute message or drawing for your partner.</p>
+        </div>
+        <button class="modal-close-btn" id="btn-close-doodle">&times;</button>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="doodle-canvas" width="600" height="400"></canvas>
+      </div>
+
+      <div class="doodle-controls">
+        <!-- Palette -->
+        <div class="color-palette">
+          <button class="color-dot active" data-color="#ff3366" style="background: #ff3366;"></button>
+          <button class="color-dot" data-color="#ff758c" style="background: #ff758c;"></button>
+          <button class="color-dot" data-color="#c084fc" style="background: #c084fc;"></button>
+          <button class="color-dot" data-color="#38bdf8" style="background: #38bdf8;"></button>
+          <button class="color-dot" data-color="#fbbf24" style="background: #fbbf24;"></button>
+          <button class="color-dot" data-color="#ffffff" style="background: #ffffff;"></button>
+        </div>
+
+        <!-- Size & Eraser -->
+        <div class="brush-settings">
+          <label for="brush-size" class="brush-label">Brush:</label>
+          <input type="range" id="brush-size" min="2" max="24" value="6">
+          <button class="btn-doodle-tool" id="btn-eraser">🧹 Eraser</button>
+          <button class="btn-doodle-tool" id="btn-clear-canvas">🗑️ Clear</button>
+        </div>
+
+        <div class="doodle-actions">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-doodle">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-send-doodle">Send Love Doodle 💕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       4. TIME CAPSULE MODAL
+       ========================================================================= -->
+  <div class="modal-overlay" id="capsule-modal" style="display: none;">
+    <div class="capsule-modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3>⏳ Create a Secret Time Capsule</h3>
+          <p>Lock a love note that can only be unlocked after a specific time!</p>
+        </div>
+        <button class="modal-close-btn" id="btn-close-capsule">&times;</button>
+      </div>
+
+      <div class="capsule-form">
+        <div class="form-group">
+          <label class="gate-label">Unlock Time Preset</label>
+          <div class="preset-capsule-grid">
+            <button type="button" class="btn-capsule-preset active" data-hours="1">⏱️ 1 Hour</button>
+            <button type="button" class="btn-capsule-preset" data-hours="6">🌙 6 Hours (Morning)</button>
+            <button type="button" class="btn-capsule-preset" data-hours="12">🌅 12 Hours</button>
+            <button type="button" class="btn-capsule-preset" data-hours="24">💌 24 Hours</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="capsule-hint-input" class="gate-label">Teaser / Hint (Visible before unlock)</label>
+          <input type="text" id="capsule-hint-input" class="gate-input" placeholder="e.g. Open when you wake up tomorrow morning ☕" maxlength="60">
+        </div>
+
+        <div class="form-group">
+          <label for="capsule-text-input" class="gate-label">Secret Message (Sealed until timer ends)</label>
+          <textarea id="capsule-text-input" class="gate-input" rows="3" placeholder="Write your hidden love letter here..."></textarea>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-block" id="btn-seal-capsule">
+          🔒 Seal & Send Time Capsule
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       5. STEALTH / PANIC DECOY SCREEN
+       ========================================================================= -->
+  <div class="stealth-screen" id="stealth-screen" style="display: none;">
+    <div class="stealth-top-bar">
+      <div class="stealth-left">
+        <span class="spreadsheet-icon">📊</span>
+        <span class="spreadsheet-title">Q3_Financial_Forecast_Consolidated_Master.xlsx - Excel Online</span>
+      </div>
+      <div class="stealth-right">
+        <span class="stealth-status">Autosaved to Cloud</span>
+        <button class="btn-restore-stealth" id="btn-exit-stealth" title="Exit Stealth Mode (or press ESC)">Exit Stealth Mode [ESC]</button>
+      </div>
+    </div>
+
+    <!-- Convincing Fake Corporate Spreadsheet -->
+    <div class="spreadsheet-toolbar">
+      <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Formulas</span><span>Data</span><span>Review</span>
+    </div>
+
+    <div class="spreadsheet-grid-wrapper">
+      <table class="spreadsheet-table">
+        <thead>
+          <tr>
+            <th class="row-num">#</th>
+            <th>A (Cost Center)</th>
+            <th>B (Q1 Actuals)</th>
+            <th>C (Q2 Actuals)</th>
+            <th>D (Q3 Target)</th>
+            <th>E (Variance %)</th>
+            <th>F (Status)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="row-num">1</td><td>Core Infrastructure</td><td>$142,500</td><td>$138,200</td><td>$135,000</td><td>-2.3%</td><td>On Track</td></tr>
+          <tr><td class="row-num">2</td><td>Platform Operations</td><td>$89,200</td><td>$91,400</td><td>$88,000</td><td>+3.8%</td><td>Review</td></tr>
+          <tr><td class="row-num">3</td><td>Data Compliance & Auditing</td><td>$45,000</td><td>$46,500</td><td>$44,000</td><td>+5.6%</td><td>Approved</td></tr>
+          <tr><td class="row-num">4</td><td>Security Infrastructure</td><td>$78,000</td><td>$75,200</td><td>$74,000</td><td>-1.6%</td><td>Optimal</td></tr>
+          <tr><td class="row-num">5</td><td>Customer Success Automation</td><td>$34,100</td><td>$32,900</td><td>$31,500</td><td>-4.2%</td><td>Completed</td></tr>
+          <tr><td class="row-num">6</td><td>API Bandwidth Allocation</td><td>$58,900</td><td>$61,200</td><td>$59,000</td><td>+3.7%</td><td>On Track</td></tr>
+          <tr><td class="row-num">7</td><td>Network CDN Optimization</td><td>$22,400</td><td>$21,800</td><td>$20,000</td><td>-8.2%</td><td>Optimal</td></tr>
+          <tr><td class="row-num">8</td><td>Quarterly Contingency</td><td>$110,000</td><td>$105,000</td><td>$100,000</td><td>-4.7%</td><td>Approved</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Toast Notification Overlay -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="toast-icon" id="toast-icon">💖</div>
+    <div class="toast-content">
+      <div class="toast-title" id="toast-title">Hillclimb</div>
+      <div class="toast-message" id="toast-message">Notification message here</div>
+    </div>
+  </div>
+
+  <!-- Core JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>
